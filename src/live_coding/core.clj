@@ -230,7 +230,7 @@
 (defn c
   [root cname inversion]
   (let [notes (chord root cname inversion)]
-    (map #(hash-map :note %) notes)))
+    (map #(hash-map :note % :decay 0.4 :release 0.4) notes)))
 
 
 
