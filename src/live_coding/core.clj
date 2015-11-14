@@ -19,7 +19,10 @@
 ;(def p sampled-piano)
 (defn play-chord [root chord-name]
   (doseq [note (chord root chord-name)]
-    (piano note)))(declare play-chord)
+    (piano note)))
+
+(defn play-chord [chord]
+  (map piano chord))
 
 ;; play a chord progression on our piano
 (let [time (now)]
@@ -176,6 +179,8 @@
 (def b {:rate 3})
 (def c {:rate 10})
 
+(def p piano)
+
 (def pats {subby [1 1 0 1 0 1 0 0]
            snare [1 0 0 1 0 0 1 0]
            wop   [1 0 0 0 0 0 0 1]})
@@ -192,6 +197,7 @@
   (cond
    (= 1 beat)         {}
    (= 0 beat)         nil
+   (nil? beat)        nil
    (map? beat)        beat
    (sequential? beat) beat
    :else              {}))
@@ -215,8 +221,14 @@
   (let [new-t (+ curr-t pat-dur)]
     (apply-by new-t #'live-sequencer [new-t pat-dur live-patterns])))
 
+(defn n
+  [note-kw]
+  {:note (note note-kw)})
+
+
+
 (live-sequencer (now) 4000 live-pats)
-(swap! live-pats assoc subby [1 1 0 b 0 1 [1 1 1] [1 1 1 1 1 1 1]])
+(swap! live-pats assoc subby [1 1 0 0 b 0 b [1 1 1 1 1 1 1 1]])
 (swap! live-pats assoc fs-snare [1 1 c c
                                  1 a [1 a c 1] c])
 (swap! live-pats assoc wop   [c a 0 0 a c c c])
@@ -225,27 +237,28 @@
                           (repeat 2 {:note (note :f4)})
                           (repeat 4 {:note (note :g4)})
                           {:note (note :c4)}])
+(swap! live-pats assoc p [[(n :c4) (n :d4)]
+                          [0 (n :f4)]
+                          (repeat 4 (n :g4))
+                          (n :c4)])
+
+
+
 
 (swap! live-pats dissoc p)
+
 (swap! live-pats dissoc dirty-kick)
 (swap! live-pats dissoc subby)
-(swap! live-pats dissoc snare)
+(swap! live-pats dissoc fs-snare)
 
 (swap! live-pats empty)
 
 (def wb (wobble-bass :amp 0.5 :note 30 :wob-hi 2000))
 (ctl wb :amp 0.1 :note 48 :wobble 2)
 
-(def melody [:c4 :f4 :g4 :c4])
-(def ms (map (fn [m] {:note note}) melody))
-(defn p
-  [note-kw]
-  (piano :note (note note-kw)))
+
 
 (stop)
-
-
-(note :c3)
 
 ;(println "foo")
 
