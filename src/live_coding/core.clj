@@ -177,7 +177,7 @@
 
 (def a {:rate 0.5})
 (def b {:rate 3})
-(def c {:rate 10})
+(def d {:rate 10})
 
 (def p piano)
 
@@ -228,31 +228,31 @@
   {:note (note note-kw)})
 
 (defn c
-  [root cname]
-  (let [notes (chord root cname)]
+  [root cname inversion]
+  (let [notes (chord root cname inversion)]
     (map #(hash-map :note %) notes)))
 
 
 
 (live-sequencer (now) 4000 live-pats)
 (swap! live-pats assoc subby [1 1 0 0 b 0 b [1 1 1 1 1 1 1 1]])
-(swap! live-pats assoc fs-snare [1 1 c c
-                                 1 a [1 a c 1] c])
-(swap! live-pats assoc wop   [c a 0 0 a c c c])
+(swap! live-pats assoc fs-snare [1 1 d d
+                                 1 a [1 a d 1] d])
+(swap! live-pats assoc wop   [d a 0 0 a d d d])
 (swap! live-pats assoc dirty-kick  [1 0 [1 1 1 1] 0])
 (swap! live-pats assoc p [{:note (note :c4)}
-                          (repeat 2 {:note (note :f4)})
-                          (repeat 4 {:note (note :g4)})
+                          (vec (repeat 2 {:note (note :f4)}))
+                          (vec (repeat 4 {:note (note :g4)}))
                           {:note (note :c4)}])
 (swap! live-pats assoc p [[(n :c4) (n :d4)]
                           [0 (n :f4)]
                           (vec (repeat 4 (n :g4)))
                           (n :c4)])
 
-(swap! live-pats assoc p [(c :c4 :major)
-                          (c :f4 :major)
-                          (c :g4 :major)
-                          (c :c4 :major)])
+(swap! live-pats assoc p [(c :c3 :major 1)
+                          (c :f3 :major 0)
+                          (c :g2 :major 2)
+                          (c :c3 :major 0)])
 (swap! live-pats assoc p ['({:note 60} {:note 64} {:note 67})])
 
 (c :c4 :major)
