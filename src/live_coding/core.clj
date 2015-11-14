@@ -209,10 +209,12 @@
     (doseq [[beat-info idx] (partition 2 (interleave pattern (range)))]
       (let [beat-t    (+ curr-t (* idx beat-sep-t))
             beat-info (normalise-beat-info beat-info)]
-        (if (sequential? beat-info)
+        (if (vector? beat-info)
           (schedule-pattern beat-t beat-sep-t sound beat-info)
           (when beat-info
-            (at beat-t (apply sound (flatten1 beat-info)))))))))
+            (if (sequential? beat-info)
+              (at beat-t (doall (map #(apply sound (flatten1 %)) beat-info)))
+              (at beat-t (apply sound (flatten1 beat-info))))))))))
 
 (defn live-sequencer
   [curr-t pat-dur live-patterns]
@@ -224,6 +226,11 @@
 (defn n
   [note-kw]
   {:note (note note-kw)})
+
+(defn c
+  [root cname]
+  (let [notes (chord root cname)]
+    (map #(hash-map :note %) notes)))
 
 
 
@@ -239,10 +246,20 @@
                           {:note (note :c4)}])
 (swap! live-pats assoc p [[(n :c4) (n :d4)]
                           [0 (n :f4)]
-                          (repeat 4 (n :g4))
+                          (vec (repeat 4 (n :g4)))
                           (n :c4)])
 
+(swap! live-pats assoc p [(c :c4 :major)
+                          (c :f4 :major)
+                          (c :g4 :major)
+                          (c :c4 :major)])
+(swap! live-pats assoc p ['({:note 60} {:note 64} {:note 67})])
 
+(c :c4 :major)
+(at (+ 1000 (now) ) (mapv #(apply p (flatten1 %)) (c :c4 :major)))
+(at (+ 1000 (now)) (piano))
+(sequential? {:a 1})
+(sequential? (c :c4 :major))
 
 
 (swap! live-pats dissoc p)
