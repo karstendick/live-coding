@@ -3,6 +3,7 @@
         [overtone.live]
         [overtone.inst.piano]
         [overtone.inst.sampled-piano]
+        [overtone.inst.synth :only [simple-flute]]
         [overtone.inst.drum :only [quick-kick haziti-clap soft-hat open-hat snare]]))
 
 
@@ -62,7 +63,7 @@
         filt   (rlpf dist (* 12 freq) 0.6)
         clp    (clip2 filt 0.8)
         reverb (free-verb clp 0.4 0.8 0.2)]
-    (* amp (env-gen (perc 0.0001 dur)) reverb)))
+    (* amp (env-gen (perc 0.0001 dur :action 0)) reverb)))
 
 (plucked-string)
 
@@ -233,10 +234,10 @@
   [root cname inversion]
   (let [notes (chord root cname inversion)]
     (map #(hash-map :note % :decay 0.4 :release 0.4) notes)))
+(def flute simple-flute)
 
 
-
-(live-sequencer (now) 4000 live-pats)
+(live-sequencer (now) 4096 live-pats)
 (swap! live-pats assoc subby [1 1 0 0 b 0 b [1 1 1 1 1 1 1 1]])
 (swap! live-pats assoc fs-snare [1 1 d d
                                  1 a [1 a d 1] d])
@@ -255,7 +256,7 @@
                           (c :f3 :major 0)
                           (c :g2 :major 2)
                           (c :c3 :major 0)])
-(swap! live-pats assoc plucked-string [(mapv n [:e4 :f4 :g4 :f4])
+(swap! live-pats assoc p [(mapv n [:e4 :f4 :g4 :f4])
                                  (mapv n [:c4 :a3 :f3 :f3])
                                  (mapv n [:g3 :b3 :d4 :g3])
                                  0])
@@ -268,7 +269,7 @@
 (vec (doall (map n [:e4 :f4 :g4 :f4])))
 
 (swap! live-pats dissoc p)
-
+(swap! live-pats dissoc plucked-string)
 (swap! live-pats dissoc dirty-kick)
 (swap! live-pats dissoc subby)
 (swap! live-pats dissoc fs-snare)
