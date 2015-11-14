@@ -64,6 +64,8 @@
         reverb (free-verb clp 0.4 0.8 0.2)]
     (* amp (env-gen (perc 0.0001 dur)) reverb)))
 
+(plucked-string)
+
 ;; ___|)_______________|\________________|\______________|\_______________|\________
 ;;|___/___||___________|_________________|_______________|________________|_________||
 ;;|__/|___||.________,-.___( )___o-;___,-.___o-;__( )__,-.________o-; __,-.___o-;__.||
@@ -253,14 +255,17 @@
                           (c :f3 :major 0)
                           (c :g2 :major 2)
                           (c :c3 :major 0)])
-(swap! live-pats assoc p ['({:note 60} {:note 64} {:note 67})])
+(swap! live-pats assoc plucked-string [(mapv n [:e4 :f4 :g4 :f4])
+                                 (mapv n [:c4 :a3 :f3 :f3])
+                                 (mapv n [:g3 :b3 :d4 :g3])
+                                 0])
 
 (c :c4 :major)
 (at (+ 1000 (now) ) (mapv #(apply p (flatten1 %)) (c :c4 :major)))
 (at (+ 1000 (now)) (piano))
 (sequential? {:a 1})
 (sequential? (c :c4 :major))
-
+(vec (doall (map n [:e4 :f4 :g4 :f4])))
 
 (swap! live-pats dissoc p)
 
